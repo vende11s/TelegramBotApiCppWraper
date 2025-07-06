@@ -18,17 +18,17 @@ std::string chatId = "chatid";
 int main(){
 	tba::TelegramBotApi bot(token);
 
-    // Every send method returns true or false depending if data was sent sucessfully
-    // You can set the chatId this way or pass it as argument everytime you send data
+	// Every send method returns true or false depending if data was sent sucessfully
+	// You can set the chatId this way or pass it as argument everytime you send data
 	bot.chatId = chatId;  
 	bot.sendText("Hello World!");
-    bot.sendPhoto("C:/users/user/desktop/img.jpg");
+	bot.sendPhoto("C:/users/user/desktop/img.jpg");
 
-    // Second way of passing chatId
-    bot.sendText("Hello World!", "-69420")
-    bot.sendFile("C:/users/user/abc.txt", "-69420");
+	// Second way of passing chatId
+	bot.sendText("Hello World!", "-69420")
+	bot.sendFile("C:/users/user/abc.txt", "-69420");
 
-    // Returns last message (std::string) in json format. All data like chat_id or date included
+	// Returns last message (std::string) in json format. All data like chat_id or date included
 	std::cout << bot.getLastMessage() << std::endl;
 }
 
