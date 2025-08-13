@@ -22,14 +22,20 @@ int main(){
 	// You can set the chatId this way or pass it as argument everytime you send data
 	bot.chatId = chatId;  
 	bot.sendText("Hello World!");
-	bot.sendPhoto("C:/users/user/desktop/img.jpg");
+	bot.sendPhotoFile("C:/users/user/desktop/img.jpg");
+    bot.sendPhotoUrl("https://example.com/img.jpg");
 
 	// Second way of passing chatId
 	bot.sendText("Hello World!", "-69420")
 	bot.sendFile("C:/users/user/abc.txt", "-69420");
 
+    // sending photo with caption and formatting
+    // formatting options: "Markdown", "MarkdownV2", "HTML" (leaving it empty results in plain text)
+    bot.sendPhotoUrl("https://example.com/img.jpg", "<b>Title</b>\nSmall text", "HTML");
+    bot.sendPhotoFile("C:/users/user/desktop/img.jpg", "caption text"); // no formatting
+
 	// Returns last message (std::string) in json format. All data like chat_id or date included
 	std::cout << bot.getLastMessage() << std::endl;
 }
-
 ```
+
