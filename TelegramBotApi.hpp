@@ -1,12 +1,11 @@
 // Copyright 2025 vende11s
-// v1.0.0
+// v1.1.0
 #pragma once
 #include <iostream>
 #include <string>
 #include <exception>
 
 #include <cpr/cpr.h>
-
 
 namespace tba {
 class TelegramBotApi {
@@ -69,8 +68,10 @@ public:
 		return true;
 	}
 
-	// sends a photo from the given local path to the Telegram chat
-	bool sendPhoto(const std::string& photoPath, std::string chat_id = "") {
+	// sends a photo from the given local path to the Telegram chat, allows a caption and parse mode
+	// parse_modes options : "Markdown", "MarkdownV2", "HTML"
+	// empty parse mode is plain text
+	bool sendPhotoFile(std::string photoPath, std::string caption="", std::string parse_mode="", std::string chat_id = "") {
 		if (chat_id.empty() && chatId.empty()) {
 			std::cerr << "Chat ID is not specified!" << std::endl;
 			return false;
@@ -84,10 +85,37 @@ public:
 		try {
 			r = cpr::Post(cpr::Url{ API_URL + TOKEN + "/sendPhoto" },
 				cpr::Multipart{ {"chat_id", chat_id},
-							   {"photo", cpr::File{photoPath}} });
+							   {"photo", cpr::File{photoPath}}, {"caption", caption}, {"parse_mode", parse_mode}});
 		}
 		catch (...) {
 			std::cerr << "Cpr error sending photo: " << photoPath << std::endl << r.text << std::endl;
+			return false;
+		}
+
+		return true;
+	}
+
+	// sends a photo from the given url to the Telegram chat, allows a caption and parse mode
+	// parse_modes options : "Markdown", "MarkdownV2", "HTML"
+	// empty parse mode is plain text
+	bool sendPhotoUrl(std::string photoUrl, std::string caption = "", std::string parse_mode = "", std::string chat_id = "") {
+		if (chat_id.empty() && chatId.empty()) {
+			std::cerr << "Chat ID is not specified!" << std::endl;
+			return false;
+		}
+
+		if (chat_id.empty()) {
+			chat_id = chatId;
+		}
+
+		cpr::Response r;
+		try {
+			r = cpr::Post(cpr::Url{ API_URL + TOKEN + "/sendPhoto" },
+				cpr::Multipart{ {"chat_id", chat_id},
+							   {"photo", photoUrl}, {"caption", caption}, {"parse_mode", parse_mode} });
+		}
+		catch (...) {
+			std::cerr << "Cpr error sending photo: " << photoUrl << std::endl << r.text << std::endl;
 			return false;
 		}
 
