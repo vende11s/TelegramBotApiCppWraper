@@ -1,5 +1,5 @@
 // Copyright 2025 vende11s
-// v1.1.0
+// v1.1.2
 #pragma once
 #include <iostream>
 #include <string>
@@ -40,6 +40,33 @@ class TelegramBotApi {
 		return escaped.str();
 	}
 
+	// type: 1 for local file, 0 for url
+	bool sendPhoto(bool type, std::string source, std::string caption, std::string parse_mode, std::string chat_id) {
+		if (chat_id.empty() && chatId.empty()) {
+			std::cerr << "Chat ID is not specified!" << std::endl;
+			return false;
+		}
+
+		if (chat_id.empty()) {
+			chat_id = chatId;
+		}
+
+		cpr::Response r;
+		try {
+			auto photoPart = type ? cpr::Part{ "photo", cpr::File{source} } : cpr::Part{ "photo", source };
+
+			r = cpr::Post(cpr::Url{ API_URL + TOKEN + "/sendPhoto" },
+				cpr::Multipart{ {"chat_id", chat_id},
+				photoPart, {"caption", caption}, {"parse_mode", parse_mode}});
+		}
+		catch (...) {
+			std::cerr << "Cpr error sending photo: " << source << std::endl << r.text << std::endl;
+			return false;
+		}
+
+		return true;
+	}
+
 public:
 	std::string chatId;
 
@@ -72,54 +99,14 @@ public:
 	// parse_modes options : "Markdown", "MarkdownV2", "HTML"
 	// empty parse mode is plain text
 	bool sendPhotoFile(std::string photoPath, std::string caption="", std::string parse_mode="", std::string chat_id = "") {
-		if (chat_id.empty() && chatId.empty()) {
-			std::cerr << "Chat ID is not specified!" << std::endl;
-			return false;
-		}
-
-		if (chat_id.empty()) {
-			chat_id = chatId;
-		}
-
-		cpr::Response r;
-		try {
-			r = cpr::Post(cpr::Url{ API_URL + TOKEN + "/sendPhoto" },
-				cpr::Multipart{ {"chat_id", chat_id},
-							   {"photo", cpr::File{photoPath}}, {"caption", caption}, {"parse_mode", parse_mode}});
-		}
-		catch (...) {
-			std::cerr << "Cpr error sending photo: " << photoPath << std::endl << r.text << std::endl;
-			return false;
-		}
-
-		return true;
+		return sendPhoto(true, photoPath, caption, parse_mode, chat_id);
 	}
 
 	// sends a photo from the given url to the Telegram chat, allows a caption and parse mode
 	// parse_modes options : "Markdown", "MarkdownV2", "HTML"
 	// empty parse mode is plain text
 	bool sendPhotoUrl(std::string photoUrl, std::string caption = "", std::string parse_mode = "", std::string chat_id = "") {
-		if (chat_id.empty() && chatId.empty()) {
-			std::cerr << "Chat ID is not specified!" << std::endl;
-			return false;
-		}
-
-		if (chat_id.empty()) {
-			chat_id = chatId;
-		}
-
-		cpr::Response r;
-		try {
-			r = cpr::Post(cpr::Url{ API_URL + TOKEN + "/sendPhoto" },
-				cpr::Multipart{ {"chat_id", chat_id},
-							   {"photo", photoUrl}, {"caption", caption}, {"parse_mode", parse_mode} });
-		}
-		catch (...) {
-			std::cerr << "Cpr error sending photo: " << photoUrl << std::endl << r.text << std::endl;
-			return false;
-		}
-
-		return true;
+		return sendPhoto(false, photoUrl, caption, parse_mode, chat_id);
 	}
 
 	// sends a file from the given local path to the Telegram chat
